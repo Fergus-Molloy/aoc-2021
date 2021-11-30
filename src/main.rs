@@ -1,3 +1,6 @@
+use aoc_2021::advent_of_code::AdventOfCodeInput;
+use aoc_2021::solutions::day_one;
 fn main() {
-    println!("Hello, world!");
+    let input = AdventOfCodeInput::get_input(1);
+    println!("{:?}", input);
 }

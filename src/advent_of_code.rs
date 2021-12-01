@@ -1,7 +1,7 @@
 use std::fs;
 #[derive(Debug)]
 pub struct AdventOfCodeInput {
-    inp: String,
+    pub inp: String,
 }
 
 impl AdventOfCodeInput {

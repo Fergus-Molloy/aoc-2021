@@ -1,5 +1,5 @@
 use crate::advent_of_code::AdventOfCodeInput;
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 struct Movement {
     direction: Direction,
     distance: i64,
@@ -12,6 +12,7 @@ enum Direction {
     Backward,
 }
 
+#[derive(Clone, Copy)]
 struct Position {
     horz: i64,
     vert: i64,
@@ -68,24 +69,18 @@ pub fn solve(aoc_input: AdventOfCodeInput) {
 }
 
 fn part_one(directions: &Vec<Movement>) -> (i64, i64) {
-    let vert_dist = directions
-        .iter()
-        .filter(|x| match x.direction {
-            Direction::Up => true,
-            Direction::Down => true,
-            _ => false,
-        })
-        .map(|x| x.distance)
-        .sum();
-    let horz_dist = directions
-        .iter()
-        .filter(|x| match x.direction {
-            Direction::Forward => true,
-            Direction::Backward => true,
-            _ => false,
-        })
-        .map(|x| x.distance)
-        .sum();
+    let mut horz_dist = 0;
+    let mut vert_dist = 0;
+    let mut mov_horz = |x: i64| horz_dist += x;
+    let mut mov_vert = |x: i64| vert_dist += x;
+    for mov in directions {
+        match mov.direction {
+            Direction::Up => mov_vert(mov.distance),
+            Direction::Down => mov_vert(mov.distance),
+            Direction::Forward => mov_horz(mov.distance),
+            Direction::Backward => mov_horz(mov.distance),
+        }
+    }
     (horz_dist, vert_dist)
 }
 

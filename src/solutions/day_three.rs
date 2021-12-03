@@ -8,20 +8,6 @@ impl BitArray {
     fn index(&self, index: usize) -> u64 {
         (self.arr >> index) & 1
     }
-    fn set(&mut self, index: u64, value: bool) {
-        if index == 0 {
-            if value {
-                self.arr += 1;
-            }
-            return;
-        }
-        if value {
-            self.arr = self.arr | (2u64.pow((index - 1) as u32) << 1)
-        } else {
-            let mask: u64 = 0xFFFFFFFFFFFFFFFF - (index << 1);
-            self.arr &= mask;
-        }
-    }
 }
 
 impl std::fmt::Debug for BitArray {
@@ -43,10 +29,6 @@ pub fn solve(aoc_input: AdventOfCodeInput) {
     println!("Day 3: ({},{})", pt1, pt2);
 }
 
-fn most_common(numbers: &Vec<BitArray>, i: u64) -> bool {
-    let common_min = (numbers.len() / 2) as u64;
-    numbers.iter().map(|x| x.index(i as usize)).sum::<u64>() > common_min
-}
 fn get_ones_count(numbers: &Vec<BitArray>, i: u64) -> (u64, u64) {
     let ones = numbers.iter().map(|x| x.index(i as usize)).sum::<u64>();
     let zeros = numbers.len() as u64 - ones;
@@ -54,26 +36,28 @@ fn get_ones_count(numbers: &Vec<BitArray>, i: u64) -> (u64, u64) {
 }
 
 fn part_one(codes: &Vec<BitArray>) -> u64 {
-    let mut gamma = BitArray { arr: 0 };
-    let mut epsilon = BitArray { arr: 0 };
-    let common_min = (codes.len() / 2) as u64;
+    let mut g = String::new();
+    let mut e = String::new();
     for i in (0..12).rev() {
-        if most_common(codes, i) {
-            gamma.set(i as u64, true);
-            epsilon.set(i as u64, false);
+        let (ones, zeros) = get_ones_count(codes, i);
+        if ones > zeros {
+            g.push('1');
+            e.push('0');
         } else {
-            gamma.set(i as u64, false);
-            epsilon.set(i as u64, true);
+            g.push('0');
+            e.push('1');
         }
     }
-    gamma.arr * epsilon.arr
+    let ga = u64::from_str_radix(&g, 2).unwrap();
+    let ea = u64::from_str_radix(&e, 2).unwrap();
+    ga * ea
 }
 
 fn part_two(_codes: Vec<BitArray>) -> u64 {
     let mut o2_codes = _codes.clone();
     for i in (0..12).rev() {
         let (ones, zeros) = get_ones_count(&o2_codes, i);
-        let num_to_match = if ones > zeros || ones == zeros { 1 } else { 0 };
+        let num_to_match = if ones >= zeros { 1 } else { 0 };
         o2_codes = o2_codes
             .into_iter()
             .filter(|x| x.index(i as usize) == num_to_match)
@@ -82,10 +66,11 @@ fn part_two(_codes: Vec<BitArray>) -> u64 {
             break;
         }
     }
+
     let mut co2_codes = _codes.clone();
     for i in (0..12).rev() {
-        let (ones, zeros) = get_ones_count(&o2_codes, i);
-        let num_to_match = if ones > zeros || ones == zeros { 0 } else { 1 };
+        let (ones, zeros) = get_ones_count(&co2_codes, i);
+        let num_to_match = if ones < zeros { 1 } else { 0 };
         co2_codes = co2_codes
             .into_iter()
             .filter(|x| x.index(i as usize) == num_to_match)

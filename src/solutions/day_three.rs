@@ -81,6 +81,5 @@ fn part_two(_codes: Vec<BitArray>) -> u64 {
     }
     let o2 = o2_codes.iter().next().unwrap();
     let co2 = co2_codes.iter().next().unwrap();
-    println!("{}, {}", o2.arr, co2.arr);
     o2.arr * co2.arr
 }

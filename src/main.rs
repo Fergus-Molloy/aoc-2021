@@ -1,9 +1,9 @@
 use aoc_2021::advent_of_code::AdventOfCodeInput;
-use aoc_2021::solutions::{day_five, day_four, day_one, day_six, day_three, day_two};
+use aoc_2021::solutions::{day_five, day_four, day_one, day_seven, day_six, day_three, day_two};
 use chrono::prelude::*;
 fn main() {
     let start = Utc::now();
-    for i in 6..7 {
+    for i in 7..8 {
         let input = AdventOfCodeInput::get_input(i);
         match i {
             1 => day_one::solve(input),
@@ -12,6 +12,7 @@ fn main() {
             4 => day_four::solve(input),
             5 => day_five::solve(input),
             6 => day_six::solve(input),
+            7 => day_seven::solve(input),
             _ => unimplemented!(),
         }
     }

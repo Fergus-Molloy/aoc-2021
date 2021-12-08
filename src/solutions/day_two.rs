@@ -1,19 +1,18 @@
 use crate::advent_of_code::AdventOfCodeInput;
 #[derive(Debug, Clone, Copy)]
-struct Movement {
+pub struct Movement {
     direction: Direction,
     distance: i64,
 }
 #[derive(Debug, Clone, Copy)]
-enum Direction {
+pub enum Direction {
     Up,
     Down,
     Forward,
-    Backward,
 }
 
 #[derive(Clone, Copy)]
-struct Position {
+pub struct Position {
     horz: i64,
     vert: i64,
     aim: i64,
@@ -28,15 +27,11 @@ impl Position {
                 self.horz += movement.distance;
                 self.vert += movement.distance * self.aim;
             }
-            Direction::Backward => {
-                self.horz += movement.distance;
-                self.vert += movement.distance * self.aim;
-            }
         }
     }
 }
 
-fn parse(inp: String) -> Vec<Movement> {
+pub fn parse(inp: String) -> Vec<Movement> {
     inp.lines()
         .map(|x| {
             let mut parts = x.split(' ');
@@ -44,7 +39,6 @@ fn parse(inp: String) -> Vec<Movement> {
                 "up" => Direction::Up,
                 "down" => Direction::Down,
                 "forward" => Direction::Forward,
-                "backward" => Direction::Backward,
                 _ => panic!("direction not recognised"),
             };
             let dist = parts.next().unwrap().parse::<i64>().unwrap();
@@ -54,21 +48,20 @@ fn parse(inp: String) -> Vec<Movement> {
                     Direction::Up => -dist,
                     Direction::Down => dist,
                     Direction::Forward => dist,
-                    Direction::Backward => -dist,
                 },
             }
         })
         .collect()
 }
 
-pub fn solve(aoc_input: AdventOfCodeInput) {
+pub fn solve(aoc_input: AdventOfCodeInput) -> String {
     let directions = parse(aoc_input.inp);
     let (pt1_x, pt1_y) = part_one(&directions);
     let (pt2_x, pt2_y) = part_two(&directions);
-    println!("Day 2: ({},{})", pt1_x * pt1_y, pt2_x * pt2_y);
+    format!("Day 2: ({},{})", pt1_x * pt1_y, pt2_x * pt2_y)
 }
 
-fn part_one(directions: &Vec<Movement>) -> (i64, i64) {
+pub fn part_one(directions: &Vec<Movement>) -> (i64, i64) {
     let mut horz_dist = 0;
     let mut vert_dist = 0;
     let mut mov_horz = |x: i64| horz_dist += x;
@@ -78,13 +71,12 @@ fn part_one(directions: &Vec<Movement>) -> (i64, i64) {
             Direction::Up => mov_vert(mov.distance),
             Direction::Down => mov_vert(mov.distance),
             Direction::Forward => mov_horz(mov.distance),
-            Direction::Backward => mov_horz(mov.distance),
         }
     }
     (horz_dist, vert_dist)
 }
 
-fn part_two(directions: &Vec<Movement>) -> (i64, i64) {
+pub fn part_two(directions: &Vec<Movement>) -> (i64, i64) {
     let mut pos = Position {
         horz: 0,
         vert: 0,
@@ -94,4 +86,26 @@ fn part_two(directions: &Vec<Movement>) -> (i64, i64) {
         pos.move_pos(dir);
     }
     (pos.horz, pos.vert)
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+    use crate::advent_of_code::AdventOfCodeInput;
+    #[test]
+    fn d2a() {
+        let aoc_input = AdventOfCodeInput::get_input(2);
+        let inp = parse(aoc_input.inp);
+
+        let (a, b) = part_one(&inp);
+        assert_eq!(a * b, 2019945);
+    }
+    #[test]
+    fn d2b() {
+        let aoc_input = AdventOfCodeInput::get_input(2);
+        let inp = parse(aoc_input.inp);
+
+        let (a, b) = part_two(&inp);
+        assert_eq!(a * b, 1599311480);
+    }
 }

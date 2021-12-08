@@ -1,6 +1,6 @@
 use crate::advent_of_code::AdventOfCodeInput;
 use std::collections::HashMap;
-pub fn solve(aoc_input: AdventOfCodeInput) {
+pub fn solve(aoc_input: AdventOfCodeInput) -> String {
     let fish: Vec<u64> = aoc_input
         .inp
         .split(',')
@@ -9,18 +9,21 @@ pub fn solve(aoc_input: AdventOfCodeInput) {
     let mut fish_ages = HashMap::new();
     for f in fish {
         let _ = match fish_ages.get(&f) {
-            Some(val) => fish_ages.insert(f, val + 1),
+            Some(val) => {
+                let new_val = val + 1;
+                fish_ages.insert(f, new_val)
+            }
             None => fish_ages.insert(f, 1),
         };
     }
     let pt1 = part_one(&fish_ages);
     let pt2 = part_two(&fish_ages);
-    println!("Day 6: ({},{})", pt1, pt2);
+    format!("Day 6: ({},{})", pt1, pt2)
 }
 
 fn execute(fish: &HashMap<u64, u64>, lim: u64) -> u64 {
     let mut curr_fish = fish.clone();
-    for i in 0..lim {
+    for _ in 0..lim {
         let mut new_map = HashMap::new();
 
         match curr_fish.get(&0) {
@@ -36,7 +39,10 @@ fn execute(fish: &HashMap<u64, u64>, lim: u64) -> u64 {
                 continue;
             } else {
                 let _ = match new_map.get(&(key - 1)) {
-                    Some(v) => new_map.insert(key - 1, v + val),
+                    Some(v) => {
+                        let new_val = v + val;
+                        new_map.insert(key - 1, new_val)
+                    }
                     None => new_map.insert(key - 1, val),
                 };
             }
@@ -47,10 +53,56 @@ fn execute(fish: &HashMap<u64, u64>, lim: u64) -> u64 {
     curr_fish.iter().map(|(_, val)| val).sum::<u64>()
 }
 
-fn part_one(fish: &HashMap<u64, u64>) -> u64 {
+pub fn part_one(fish: &HashMap<u64, u64>) -> u64 {
     execute(fish, 80)
 }
 
-fn part_two(fish: &HashMap<u64, u64>) -> u64 {
+pub fn part_two(fish: &HashMap<u64, u64>) -> u64 {
     execute(fish, 256)
+}
+#[cfg(test)]
+mod test {
+    use super::*;
+    #[test]
+    fn d6a() {
+        let aoc_input = AdventOfCodeInput::get_input(6);
+        let fish: Vec<u64> = aoc_input
+            .inp
+            .split(',')
+            .map(|x| x.trim().parse::<u64>().unwrap())
+            .collect();
+        let mut fish_ages = HashMap::new();
+        for f in fish {
+            let _ = match fish_ages.get(&f) {
+                Some(val) => {
+                    let new_val = val + 1;
+                    fish_ages.insert(f, new_val)
+                }
+                None => fish_ages.insert(f, 1),
+            };
+        }
+        assert_eq!(part_one(&fish_ages), 371379);
+    }
+    #[test]
+    fn d6b() {
+        let aoc_input = AdventOfCodeInput::get_input(6);
+        let fish: Vec<u64> = aoc_input
+            .inp
+            .split(',')
+            .map(|x| x.trim().parse::<u64>().unwrap())
+            .collect();
+        let mut fish_ages = HashMap::new();
+        for f in fish {
+            match fish_ages.get(&f) {
+                Some(val) => {
+                    let new_val = val + 1;
+                    fish_ages.insert(f, new_val);
+                }
+                None => {
+                    fish_ages.insert(f, 1);
+                }
+            };
+        }
+        assert_eq!(part_two(&fish_ages), 1674303997472);
+    }
 }

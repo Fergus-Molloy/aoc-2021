@@ -1,22 +1,21 @@
 use aoc_2021::advent_of_code::AdventOfCodeInput;
 use aoc_2021::solutions::{day_five, day_four, day_one, day_seven, day_six, day_three, day_two};
-use chrono::prelude::*;
+use std::time::Instant;
 fn main() {
-    let start = Utc::now();
-    for i in 7..8 {
+    let start = Instant::now();
+    for i in 1..8 {
         let input = AdventOfCodeInput::get_input(i);
         match i {
-            1 => day_one::solve(input),
-            2 => day_two::solve(input),
-            3 => day_three::solve(input),
-            4 => day_four::solve(input),
-            5 => day_five::solve(input),
-            6 => day_six::solve(input),
-            7 => day_seven::solve(input),
+            1 => println!("{}", day_one::solve(input)),
+            2 => println!("{}", day_two::solve(input)),
+            3 => println!("{}", day_three::solve(input)),
+            4 => println!("{}", day_four::solve(input)),
+            5 => println!("{}", day_five::solve(input)),
+            6 => println!("{}", day_six::solve(input)),
+            7 => println!("{}", day_seven::solve(input)),
             _ => unimplemented!(),
         }
     }
-    let end = Utc::now();
-    let dur = end - start;
-    println!("{}s", dur.num_nanoseconds().unwrap() as f64 / 1e9);
+    let end = Instant::now();
+    println!("Total runtime {:?}", end - start);
 }

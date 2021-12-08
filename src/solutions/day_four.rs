@@ -1,18 +1,18 @@
 use crate::advent_of_code::AdventOfCodeInput;
 #[derive(Debug, Clone)]
-struct BingoBoard {
+pub struct BingoBoard {
     board: Vec<BingoNum>,
     size: (u64, u64),
     won: bool,
 }
 #[derive(Debug, Clone, Copy)]
-struct BingoNum {
+pub struct BingoNum {
     num: u64,
     pos: Position,
     called: bool,
 }
 #[derive(Debug, Clone, Copy)]
-struct Position {
+pub struct Position {
     x: u64,
     y: u64,
 }
@@ -72,7 +72,7 @@ impl BingoBoard {
     }
 }
 
-pub fn solve(aoc_input: AdventOfCodeInput) {
+pub fn parse(aoc_input: AdventOfCodeInput) -> (Vec<BingoBoard>, Vec<u64>) {
     let mut lines = aoc_input.inp.lines();
     let numbers: Vec<u64> = lines
         .next()
@@ -108,13 +108,17 @@ pub fn solve(aoc_input: AdventOfCodeInput) {
         }
     }
     boards.push(curr_board.clone());
-
-    let pt1 = part_one(&numbers, &mut boards.clone());
-    let pt2 = part_two(&numbers, &mut boards);
-    println!("Day 4: ({},{})", pt1, pt2);
+    (boards, numbers)
 }
 
-fn part_one(numbers: &Vec<u64>, boards: &mut Vec<BingoBoard>) -> u64 {
+pub fn solve(aoc_input: AdventOfCodeInput) -> String {
+    let (mut boards, numbers) = parse(aoc_input);
+    let pt1 = part_one(&numbers, &mut boards.clone());
+    let pt2 = part_two(&numbers, &mut boards);
+    format!("Day 4: ({},{})", pt1, pt2)
+}
+
+pub fn part_one(numbers: &Vec<u64>, boards: &mut Vec<BingoBoard>) -> u64 {
     for num in numbers {
         for board in boards.iter_mut() {
             board.call_num(*num);
@@ -132,7 +136,7 @@ fn part_one(numbers: &Vec<u64>, boards: &mut Vec<BingoBoard>) -> u64 {
     panic!("No boards one even after all numbers were called");
 }
 
-fn part_two(numbers: &Vec<u64>, boards: &mut Vec<BingoBoard>) -> u64 {
+pub fn part_two(numbers: &Vec<u64>, boards: &mut Vec<BingoBoard>) -> u64 {
     // flags for last board
     let mut last_board = false;
     let mut num_for_final = 0;
@@ -157,4 +161,59 @@ fn part_two(numbers: &Vec<u64>, boards: &mut Vec<BingoBoard>) -> u64 {
         num_for_final += 1;
     }
     last_board.sum_uncalled() * *numbers.iter().nth(num_for_final - 1).unwrap()
+}
+#[cfg(test)]
+mod test {
+    use super::*;
+    use crate::advent_of_code::AdventOfCodeInput;
+    fn parse(aoc_input: AdventOfCodeInput) -> (Vec<BingoBoard>, Vec<u64>) {
+        let mut lines = aoc_input.inp.lines();
+        let numbers: Vec<u64> = lines
+            .next()
+            .unwrap()
+            .split(',')
+            .map(|x| x.parse::<u64>().expect("could not parse input"))
+            .collect();
+        lines.next(); // remove empty line
+        let mut boards = Vec::new();
+        let mut curr_board = BingoBoard::new();
+        let mut row = 0;
+        for line in lines {
+            if line.trim().is_empty() {
+                boards.push(curr_board.clone());
+                curr_board = BingoBoard::new();
+                row = 0;
+            } else {
+                let mut rows: Vec<BingoNum> = line
+                    .split(' ')
+                    .filter(|x| !x.trim().is_empty())
+                    .enumerate()
+                    .map(|(col, x)| BingoNum {
+                        num: x.parse::<u64>().unwrap(),
+                        called: false,
+                        pos: Position {
+                            x: col as u64,
+                            y: row,
+                        },
+                    })
+                    .collect();
+                curr_board.board.append(&mut rows);
+                row += 1;
+            }
+        }
+        boards.push(curr_board.clone());
+        (boards, numbers)
+    }
+    #[test]
+    fn d4a() {
+        let aoc_input = AdventOfCodeInput::get_input(4);
+        let (mut boards, numbers) = parse(aoc_input);
+        assert_eq!(part_one(&numbers, &mut boards), 60368);
+    }
+    #[test]
+    fn d4b() {
+        let aoc_input = AdventOfCodeInput::get_input(4);
+        let (mut boards, numbers) = parse(aoc_input);
+        assert_eq!(part_two(&numbers, &mut boards), 17435);
+    }
 }

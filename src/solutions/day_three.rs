@@ -1,7 +1,7 @@
 use crate::advent_of_code::AdventOfCodeInput;
 #[derive(Clone, Copy)]
-struct BitArray {
-    arr: u64,
+pub struct BitArray {
+    pub arr: u64,
 }
 
 impl BitArray {
@@ -16,7 +16,7 @@ impl std::fmt::Debug for BitArray {
     }
 }
 
-pub fn solve(aoc_input: AdventOfCodeInput) {
+pub fn solve(aoc_input: AdventOfCodeInput) -> String {
     let codes: Vec<BitArray> = aoc_input
         .inp
         .lines()
@@ -26,7 +26,7 @@ pub fn solve(aoc_input: AdventOfCodeInput) {
         .collect();
     let pt1 = part_one(&codes);
     let pt2 = part_two(codes);
-    println!("Day 3: ({},{})", pt1, pt2);
+    format!("Day 3: ({},{})", pt1, pt2)
 }
 
 fn get_ones_count(numbers: &Vec<BitArray>, i: u64) -> (u64, u64) {
@@ -35,7 +35,7 @@ fn get_ones_count(numbers: &Vec<BitArray>, i: u64) -> (u64, u64) {
     (ones, zeros)
 }
 
-fn part_one(codes: &Vec<BitArray>) -> u64 {
+pub fn part_one(codes: &Vec<BitArray>) -> u64 {
     let mut g = String::new();
     let mut e = String::new();
     for i in (0..12).rev() {
@@ -53,7 +53,7 @@ fn part_one(codes: &Vec<BitArray>) -> u64 {
     ga * ea
 }
 
-fn part_two(_codes: Vec<BitArray>) -> u64 {
+pub fn part_two(_codes: Vec<BitArray>) -> u64 {
     let mut o2_codes = _codes.clone();
     for i in (0..12).rev() {
         let (ones, zeros) = get_ones_count(&o2_codes, i);
@@ -82,4 +82,33 @@ fn part_two(_codes: Vec<BitArray>) -> u64 {
     let o2 = o2_codes.iter().next().unwrap();
     let co2 = co2_codes.iter().next().unwrap();
     o2.arr * co2.arr
+}
+#[cfg(test)]
+mod test {
+    use super::*;
+    use crate::advent_of_code::AdventOfCodeInput;
+    #[test]
+    fn d3a() {
+        let aoc_input = AdventOfCodeInput::get_input(3);
+        let codes: Vec<BitArray> = aoc_input
+            .inp
+            .lines()
+            .map(|x| BitArray {
+                arr: u64::from_str_radix(x, 2).unwrap(),
+            })
+            .collect();
+        assert_eq!(part_one(&codes), 775304);
+    }
+    #[test]
+    fn d3b() {
+        let aoc_input = AdventOfCodeInput::get_input(3);
+        let codes: Vec<BitArray> = aoc_input
+            .inp
+            .lines()
+            .map(|x| BitArray {
+                arr: u64::from_str_radix(x, 2).unwrap(),
+            })
+            .collect();
+        assert_eq!(part_two(codes), 1370737);
+    }
 }

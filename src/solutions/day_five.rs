@@ -1,5 +1,5 @@
 use crate::advent_of_code::AdventOfCodeInput;
-use std::collections::{HashMap, HashSet};
+use std::collections::HashMap;
 use std::fmt::Formatter;
 #[derive(Debug, Clone)]
 struct Line {
@@ -87,13 +87,13 @@ impl Line {
     }
 }
 
-pub fn solve(aoc_input: AdventOfCodeInput) {
+pub fn solve(aoc_input: AdventOfCodeInput) -> String {
     let pt1 = part_one(&aoc_input.inp);
     let pt2 = part_two(&aoc_input.inp);
-    println!("Day 5: ({},{})", pt1, pt2);
+    format!("Day 5: ({},{})", pt1, pt2)
 }
 
-fn part_one(inp: &String) -> u64 {
+pub fn part_one(inp: &String) -> u64 {
     let mut map = HashMap::new();
     let lines = inp.lines();
     for line in lines {
@@ -105,7 +105,10 @@ fn part_one(inp: &String) -> u64 {
         if !line.is_diagonal() {
             for point in line.generate_points() {
                 let _ = match map.get(&point) {
-                    Some(val) => map.insert(point, val + 1),
+                    Some(val) => {
+                        let new_val = val + 1;
+                        map.insert(point, new_val)
+                    }
                     None => map.insert(point, 1),
                 };
             }
@@ -114,7 +117,7 @@ fn part_one(inp: &String) -> u64 {
     map.iter().filter(|(_, val)| **val > 1).count() as u64
 }
 
-fn part_two(inp: &String) -> u64 {
+pub fn part_two(inp: &String) -> u64 {
     let mut map = HashMap::new();
     let lines = inp.lines();
     for line in lines {
@@ -125,10 +128,27 @@ fn part_two(inp: &String) -> u64 {
         let line = Line::new(p1, p2);
         for point in line.generate_points() {
             let _ = match map.get(&point) {
-                Some(val) => map.insert(point, val + 1),
+                Some(val) => {
+                    let new_val = val + 1;
+                    map.insert(point, new_val)
+                }
                 None => map.insert(point, 1),
             };
         }
     }
     map.iter().filter(|(_, val)| **val > 1).count() as u64
+}
+#[cfg(test)]
+mod test {
+    use super::*;
+    #[test]
+    fn d5a() {
+        let aoc_input = AdventOfCodeInput::get_input(5);
+        assert_eq!(part_one(&aoc_input.inp), 5442);
+    }
+    #[test]
+    fn d5b() {
+        let aoc_input = AdventOfCodeInput::get_input(5);
+        assert_eq!(part_two(&aoc_input.inp), 19571);
+    }
 }

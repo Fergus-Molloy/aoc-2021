@@ -1,5 +1,5 @@
 use std::fs;
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct AdventOfCodeInput {
     pub inp: String,
 }

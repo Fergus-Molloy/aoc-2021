@@ -2,8 +2,8 @@
 use crate::advent_of_code::AdventOfCodeInput;
 use std::collections::HashMap;
 pub struct Notes {
-    input: Vec<String>,
-    output: Vec<String>,
+    pub input: Vec<String>,
+    pub output: Vec<String>,
 }
 
 pub fn solve(aoc_input: AdventOfCodeInput) -> String {
@@ -56,14 +56,24 @@ pub fn part_one(notes: &Vec<Notes>) -> u64 {
 }
 
 fn pattern_diff(left: &String, right: &String) -> bool {
-    let eq = left
-        .chars()
-        .filter(|c| right.contains(&c.to_string()))
-        .collect::<String>();
-    eq.len() != right.len()
+    let mut res = false;
+    for c in right.chars() {
+        if !left.contains(&c.to_string()) {
+            res = true;
+        }
+    }
+    res
 }
 
-// TODO: For some reason 2 and 9 are getting mixed up????
+fn reverse_diff(left: &String, right: &String) -> bool {
+    let mut res = true;
+    for c in left.chars() {
+        if !right.contains(&c.to_string()) {
+            res = false;
+        }
+    }
+    res
+}
 
 pub fn part_two(notes: &Vec<Notes>) -> u64 {
     let mut values = Vec::new();
@@ -86,6 +96,7 @@ pub fn part_two(notes: &Vec<Notes>) -> u64 {
                 Some(pattern) => {
                     if pattern_diff(code, pattern) {
                         map.try_insert(6, code.clone());
+                        break;
                     }
                 }
                 None => println!("Could not find pattern 1",),
@@ -99,7 +110,8 @@ pub fn part_two(notes: &Vec<Notes>) -> u64 {
             match map.get(&4) {
                 Some(pattern) => {
                     if pattern_diff(code, pattern) {
-                        map.try_insert(4, code.clone());
+                        map.try_insert(0, code.clone());
+                        break;
                     }
                 }
                 None => (),
@@ -109,14 +121,16 @@ pub fn part_two(notes: &Vec<Notes>) -> u64 {
         for code in display.input.clone().iter().filter(|x| x.len() == 6) {
             if !map.values().any(|x| x == code) {
                 map.try_insert(9, code.clone());
+                break;
             }
         }
         // find 5
         for code in display.input.clone().iter().filter(|x| x.len() == 5) {
             match map.get(&6) {
                 Some(pattern) => {
-                    if pattern_diff(code, pattern) {
+                    if reverse_diff(code, pattern) {
                         map.try_insert(5, code.clone());
+                        break;
                     }
                 }
                 None => (),
@@ -129,8 +143,9 @@ pub fn part_two(notes: &Vec<Notes>) -> u64 {
             }
             match map.get(&9) {
                 Some(pattern) => {
-                    if pattern_diff(code, pattern) {
+                    if reverse_diff(code, pattern) {
                         map.try_insert(3, code.clone());
+                        break;
                     }
                 }
                 None => (),
@@ -144,21 +159,14 @@ pub fn part_two(notes: &Vec<Notes>) -> u64 {
         }
         let mut value = String::new();
         for val in display.output.clone() {
-            let mut found = false;
             for (key, num) in map.clone() {
                 if val == num {
                     value.push_str(&format!("{}", key));
-                    found = true;
                 }
             }
-            if !found {
-                println!("Could not find mapping for code {}", val);
-            }
         }
-        println!("{:?}", map);
         values.push(value.parse::<u64>().unwrap());
     }
-    println!("values {:?}", values);
     values.iter().sum::<u64>()
 }
 

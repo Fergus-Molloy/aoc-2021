@@ -1,5 +1,7 @@
 use aoc_2021::advent_of_code::AdventOfCodeInput;
-use aoc_2021::solutions::{day_five, day_four, day_one, day_seven, day_six, day_three, day_two};
+use aoc_2021::solutions::{
+    day_eight, day_five, day_four, day_one, day_seven, day_six, day_three, day_two,
+};
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
 
 fn load_inp(day: u32) -> AdventOfCodeInput {
@@ -16,7 +18,9 @@ fn bench_day_one(c: &mut Criterion) {
         .collect();
 
     c.bench_function("d1a", |b| b.iter(|| day_one::part_one(black_box(&depths))));
-    c.bench_function("d1b", |b| b.iter(|| day_one::part_two(black_box(depths))));
+    c.bench_function("d1b", |b| {
+        b.iter(|| day_one::part_two(black_box(depths.clone())))
+    });
     c.bench_function("d1c", |b| {
         b.iter(|| day_one::solve(black_box(aoc_input.clone())))
     });
@@ -129,6 +133,45 @@ fn bench_day_seven(c: &mut Criterion) {
         b.iter(|| day_seven::solve(black_box(aoc_input.clone())))
     });
 }
+fn bench_day_eight(c: &mut Criterion) {
+    use day_eight::Notes;
+    let aoc_input = load_inp(8);
+
+    let notes: Vec<_> = aoc_input
+        .inp
+        .lines()
+        .map(|x| {
+            let first = x.split('|').next().unwrap();
+            let second = x.split('|').nth(1).unwrap();
+            let input = first
+                .split(' ')
+                .filter(|x| x.len() > 0)
+                .map(|x| {
+                    let mut sorted = x.trim().chars().collect::<Vec<char>>();
+                    sorted.sort();
+                    String::from_iter(sorted)
+                })
+                .collect();
+            let output = second
+                .trim()
+                .split(' ')
+                .filter(|x| x.len() > 0)
+                .map(|x| {
+                    let mut sorted = x.trim().chars().collect::<Vec<char>>();
+                    sorted.sort();
+                    String::from_iter(sorted)
+                })
+                .collect();
+            Notes { input, output }
+        })
+        .collect();
+
+    c.bench_function("d8a", |b| b.iter(|| day_eight::part_one(black_box(&notes))));
+    c.bench_function("d8b", |b| b.iter(|| day_eight::part_two(black_box(&notes))));
+    c.bench_function("d8c", |b| {
+        b.iter(|| day_eight::solve(black_box(aoc_input.clone())))
+    });
+}
 
 criterion_group!(day_1, bench_day_one);
 criterion_group!(day_2, bench_day_two);
@@ -137,4 +180,5 @@ criterion_group!(day_4, bench_day_four);
 criterion_group!(day_5, bench_day_five);
 criterion_group!(day_6, bench_day_six);
 criterion_group!(day_7, bench_day_seven);
-criterion_main!(day_1, day_2, day_3, day_4, day_5, day_6, day_7);
+criterion_group!(day_8, bench_day_eight);
+criterion_main!(day_1, day_2, day_3, day_4, day_5, day_6, day_7, day_8);

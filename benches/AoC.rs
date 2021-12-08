@@ -16,7 +16,7 @@ fn bench_day_one(c: &mut Criterion) {
         .collect();
 
     c.bench_function("d1a", |b| b.iter(|| day_one::part_one(black_box(&depths))));
-    c.bench_function("d1b", |b| b.iter(|| day_one::part_two(black_box(&depths))));
+    c.bench_function("d1b", |b| b.iter(|| day_one::part_two(black_box(depths))));
     c.bench_function("d1c", |b| {
         b.iter(|| day_one::solve(black_box(aoc_input.clone())))
     });

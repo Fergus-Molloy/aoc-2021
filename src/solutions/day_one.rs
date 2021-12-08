@@ -7,7 +7,7 @@ pub fn solve(aoc_input: AdventOfCodeInput) -> String {
         .map(|x| x.parse::<i64>().unwrap())
         .collect();
     let pt1 = part_one(&depths);
-    let pt2 = part_two(&depths);
+    let pt2 = part_two(depths);
     format!("Day 1: ({},{})", pt1, pt2)
 }
 
@@ -23,22 +23,23 @@ pub fn part_one(depths: &Vec<i64>) -> u64 {
     count
 }
 
-pub fn part_two(depths: &Vec<i64>) -> u64 {
+pub fn part_two(depths: Vec<i64>) -> u64 {
     let mut count = 0;
     // get first depth
-    let mut last_depth = depths[..3].into_iter().sum::<i64>();
+    let mut last_depth = depths.clone().into_iter().take(3).sum::<i64>() as u64;
+    let slice = &depths[..];
     // iterate over windows of size 3
-    for window in depths.windows(3) {
+    for window in slice.windows(3) {
         let mut total = 0;
         // sum items in window
         for i in window.iter() {
             total += i;
         }
         // count ones where depth increases
-        if total > last_depth {
+        if total as u64 > last_depth {
             count += 1;
         }
-        last_depth = total;
+        last_depth = total as u64;
     }
     count
 }
@@ -65,6 +66,6 @@ mod test {
             .lines()
             .map(|x| x.parse::<i64>().unwrap())
             .collect();
-        assert_eq!(part_two(&depths), 1748);
+        assert_eq!(part_two(depths), 1748);
     }
 }

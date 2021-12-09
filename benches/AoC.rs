@@ -61,7 +61,7 @@ fn bench_day_three(c: &mut Criterion) {
 
 fn bench_day_four(c: &mut Criterion) {
     let aoc_input = load_inp(4);
-    let (mut boards, numbers) = day_four::parse(aoc_input.clone());
+    let (boards, numbers) = day_four::parse(aoc_input.clone());
 
     c.bench_function("d4a", |b| {
         b.iter(|| day_four::part_one(black_box(&numbers), black_box(&mut boards.clone())))
@@ -89,14 +89,14 @@ fn bench_day_five(c: &mut Criterion) {
 }
 
 fn bench_day_six(c: &mut Criterion) {
-    use std::collections::HashMap;
+    use rustc_hash::FxHashMap;
     let aoc_input = load_inp(6);
     let fish: Vec<u64> = aoc_input
         .inp
         .split(',')
         .map(|x| x.trim().parse::<u64>().unwrap())
         .collect();
-    let mut fish_ages = HashMap::new();
+    let mut fish_ages = FxHashMap::default();
     for f in fish {
         let _ = match fish_ages.get(&f) {
             Some(val) => {

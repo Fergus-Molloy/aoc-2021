@@ -113,6 +113,7 @@ pub fn parse(aoc_input: AdventOfCodeInput) -> (Vec<BingoBoard>, Vec<u64>) {
 
 pub fn solve(aoc_input: AdventOfCodeInput) -> String {
     let (mut boards, numbers) = parse(aoc_input);
+
     let pt1 = part_one(&numbers, &mut boards.clone());
     let pt2 = part_two(&numbers, &mut boards);
     format!("Day 4: ({},{})", pt1, pt2)
@@ -156,11 +157,11 @@ pub fn part_two(numbers: &Vec<u64>, boards: &mut Vec<BingoBoard>) -> u64 {
     }
     let mut last_board = boards.iter_mut().filter(|x| !x.won).next().unwrap();
     while !last_board.won {
-        last_board.call_num(*numbers.iter().nth(num_for_final).unwrap());
+        last_board.call_num(numbers[num_for_final]);
         last_board.won = last_board.won();
         num_for_final += 1;
     }
-    last_board.sum_uncalled() * *numbers.iter().nth(num_for_final - 1).unwrap()
+    last_board.sum_uncalled() * numbers[num_for_final - 1]
 }
 #[cfg(test)]
 mod test {

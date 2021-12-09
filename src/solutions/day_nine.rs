@@ -1,4 +1,5 @@
 use crate::advent_of_code::AdventOfCodeInput;
+use rustc_hash::FxHashSet;
 #[derive(Clone)]
 pub struct HeightMap {
     map: Vec<Vec<usize>>,
@@ -6,9 +7,11 @@ pub struct HeightMap {
 }
 
 impl HeightMap {
+    #[inline(always)]
     const fn max_y(&self) -> usize {
         self.size.y
     }
+    #[inline(always)]
     const fn max_x(&self) -> usize {
         self.size.x
     }
@@ -29,8 +32,9 @@ impl HeightMap {
             },
         }
     }
+    #[inline(always)]
     fn get_adjacent_points(&self, point: Point) -> Vec<Point> {
-        let mut points = Vec::new();
+        let mut points = Vec::with_capacity(4);
         if point.y > 0 {
             // check above
             points.push(Point::new(point.x, point.y - 1));
@@ -49,22 +53,25 @@ impl HeightMap {
         }
         points
     }
+
     fn is_lowest(&self, point: Point) -> bool {
         let h = self.get(&point);
         let values_to_check = self.get_adjacent_points(point);
         values_to_check.iter().all(|x| self.get(x) > h)
     }
+    #[inline(always)]
     fn get(&self, point: &Point) -> usize {
         self.map[point.y][point.x]
     }
 }
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct Point {
     x: usize,
     y: usize,
 }
 
 impl Point {
+    #[inline(always)]
     fn new(x: usize, y: usize) -> Self {
         Point { x, y }
     }
@@ -77,13 +84,14 @@ pub fn solve(aoc_input: AdventOfCodeInput) -> String {
     format!("Day 9: ({},{})", pt1, pt2)
 }
 
-fn get_lowest(hmap: &HeightMap) -> Vec<Point> {
-    let mut lowest = Vec::new();
+#[inline(always)]
+fn get_lowest(hmap: &HeightMap) -> FxHashSet<Point> {
+    let mut lowest = FxHashSet::default();
     for y in 0..hmap.max_y() {
         for x in 0..hmap.max_x() {
             let p = Point::new(x, y);
             if hmap.is_lowest(p) {
-                lowest.push(p);
+                lowest.insert(p);
             }
         }
     }
@@ -95,42 +103,31 @@ pub fn part_one(hmap: &HeightMap) -> u64 {
     lowest.iter().map(|x| (hmap.get(x) + 1) as u64).sum::<u64>()
 }
 
-fn append(b: &mut Vec<Point>, add: &mut Vec<Point>) {
-    for item in add {
-        if b.iter().any(|x| x == item) {
-            continue;
-        }
-        b.push(*item);
-    }
-}
-
 pub fn part_two(hmap: HeightMap) -> u64 {
     let lowest = get_lowest(&hmap);
-    let mut sizes: Vec<u64> = Vec::new();
+    let mut sizes: Vec<u64> = Vec::with_capacity(lowest.len());
     for point in lowest {
-        let mut points = Vec::new();
-        points.push(point);
+        let mut points = FxHashSet::default();
+        points.insert(point);
         let mut added = 1;
         while added != 0 {
             added = 0;
             let mut new_points = points.clone();
             for p in points.iter() {
                 let adj = hmap.get_adjacent_points(*p);
-                let to_add = adj
-                    .into_iter()
-                    .filter(|x| !points.iter().any(|y| y == x) && hmap.get(x) != 9)
-                    .collect::<Vec<Point>>();
+                let to_add = adj.into_iter().filter(|x| hmap.get(x) != 9);
                 for new_p in to_add {
-                    new_points.push(new_p);
-                    added += 1;
+                    if new_points.insert(new_p) {
+                        added += 1;
+                    }
                 }
             }
-            append(&mut points, &mut new_points);
+            points = new_points;
         }
         let size = points.len() as u64;
         sizes.push(size);
     }
-    sizes.sort();
+    sizes.sort_unstable();
     let top_3 = sizes.iter().rev().take(3);
     let mut total = 1;
     for item in top_3 {

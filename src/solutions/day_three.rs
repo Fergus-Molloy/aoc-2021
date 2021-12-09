@@ -67,7 +67,7 @@ pub fn part_two(_codes: Vec<BitArray>) -> u64 {
         }
     }
 
-    let mut co2_codes = _codes.clone();
+    let mut co2_codes = _codes;
     for i in (0..12).rev() {
         let (ones, zeros) = get_ones_count(&co2_codes, i);
         let num_to_match = if ones < zeros { 1 } else { 0 };

@@ -1,6 +1,6 @@
 #![allow(unused_must_use)]
 use crate::advent_of_code::AdventOfCodeInput;
-use std::collections::HashMap;
+use rustc_hash::FxHashMap;
 #[derive(Debug)]
 pub struct Notes {
     pub input: Vec<String>,
@@ -19,7 +19,7 @@ pub fn solve(aoc_input: AdventOfCodeInput) -> String {
                 .filter(|x| x.len() > 0)
                 .map(|x| {
                     let mut sorted = x.trim().chars().collect::<Vec<char>>();
-                    sorted.sort();
+                    sorted.sort_unstable();
                     String::from_iter(sorted)
                 })
                 .collect();
@@ -29,7 +29,7 @@ pub fn solve(aoc_input: AdventOfCodeInput) -> String {
                 .filter(|x| x.len() > 0)
                 .map(|x| {
                     let mut sorted = x.trim().chars().collect::<Vec<char>>();
-                    sorted.sort();
+                    sorted.sort_unstable();
                     String::from_iter(sorted)
                 })
                 .collect();
@@ -80,7 +80,7 @@ pub fn part_two(notes: &mut Vec<Notes>) -> u64 {
     let mut values = Vec::new();
     for display in notes {
         &display.input[..].sort_by(|a, b| a.len().cmp(&b.len()));
-        let mut map = HashMap::new();
+        let mut map = FxHashMap::default();
         map.try_insert(1, display.input[0].clone());
         map.try_insert(7, display.input[1].clone());
         map.try_insert(4, display.input[2].clone());
@@ -156,7 +156,7 @@ pub fn part_two(notes: &mut Vec<Notes>) -> u64 {
             }
         }
         let mut value = String::new();
-        let mut final_map = HashMap::new();
+        let mut final_map = FxHashMap::default();
         for (key, val) in map.clone() {
             final_map.insert(val, key);
         }
@@ -211,7 +211,7 @@ mod test {
                     .filter(|x| x.len() > 0)
                     .map(|x| {
                         let mut sorted = x.trim().chars().collect::<Vec<char>>();
-                        sorted.sort();
+                        sorted.sort_unstable();
                         String::from_iter(sorted)
                     })
                     .collect();
@@ -221,7 +221,7 @@ mod test {
                     .filter(|x| x.len() > 0)
                     .map(|x| {
                         let mut sorted = x.trim().chars().collect::<Vec<char>>();
-                        sorted.sort();
+                        sorted.sort_unstable();
                         String::from_iter(sorted)
                     })
                     .collect();

@@ -1,12 +1,12 @@
 use crate::advent_of_code::AdventOfCodeInput;
-use std::collections::HashMap;
+use rustc_hash::FxHashMap;
 pub fn solve(aoc_input: AdventOfCodeInput) -> String {
     let fish: Vec<u64> = aoc_input
         .inp
         .split(',')
         .map(|x| x.trim().parse::<u64>().unwrap())
         .collect();
-    let mut fish_ages = HashMap::new();
+    let mut fish_ages = FxHashMap::default();
     for f in fish {
         let _ = match fish_ages.get(&f) {
             Some(val) => {
@@ -21,10 +21,10 @@ pub fn solve(aoc_input: AdventOfCodeInput) -> String {
     format!("Day 6: ({},{})", pt1, pt2)
 }
 
-fn execute(fish: &HashMap<u64, u64>, lim: u64) -> u64 {
+fn execute(fish: &FxHashMap<u64, u64>, lim: u64) -> u64 {
     let mut curr_fish = fish.clone();
     for _ in 0..lim {
-        let mut new_map = HashMap::new();
+        let mut new_map = FxHashMap::default();
 
         match curr_fish.get(&0) {
             Some(val) => {
@@ -53,11 +53,11 @@ fn execute(fish: &HashMap<u64, u64>, lim: u64) -> u64 {
     curr_fish.iter().map(|(_, val)| val).sum::<u64>()
 }
 
-pub fn part_one(fish: &HashMap<u64, u64>) -> u64 {
+pub fn part_one(fish: &FxHashMap<u64, u64>) -> u64 {
     execute(fish, 80)
 }
 
-pub fn part_two(fish: &HashMap<u64, u64>) -> u64 {
+pub fn part_two(fish: &FxHashMap<u64, u64>) -> u64 {
     execute(fish, 256)
 }
 #[cfg(test)]
@@ -71,7 +71,7 @@ mod test {
             .split(',')
             .map(|x| x.trim().parse::<u64>().unwrap())
             .collect();
-        let mut fish_ages = HashMap::new();
+        let mut fish_ages = FxHashMap::default();
         for f in fish {
             let _ = match fish_ages.get(&f) {
                 Some(val) => {
@@ -91,7 +91,7 @@ mod test {
             .split(',')
             .map(|x| x.trim().parse::<u64>().unwrap())
             .collect();
-        let mut fish_ages = HashMap::new();
+        let mut fish_ages = FxHashMap::default();
         for f in fish {
             match fish_ages.get(&f) {
                 Some(val) => {

@@ -5,7 +5,7 @@ pub struct BitArray {
 }
 
 impl BitArray {
-    fn index(&self, index: usize) -> u64 {
+    fn index(self, index: usize) -> u64 {
         (self.arr >> index) & 1
     }
 }
@@ -29,13 +29,13 @@ pub fn solve(aoc_input: AdventOfCodeInput) -> String {
     format!("Day 3: ({},{})", pt1, pt2)
 }
 
-fn get_ones_count(numbers: &Vec<BitArray>, i: u64) -> (u64, u64) {
+fn get_ones_count(numbers: &[BitArray], i: u64) -> (u64, u64) {
     let ones = numbers.iter().map(|x| x.index(i as usize)).sum::<u64>();
     let zeros = numbers.len() as u64 - ones;
     (ones, zeros)
 }
 
-pub fn part_one(codes: &Vec<BitArray>) -> u64 {
+pub fn part_one(codes: &[BitArray]) -> u64 {
     let mut g = String::new();
     let mut e = String::new();
     for i in (0..12).rev() {
@@ -53,8 +53,8 @@ pub fn part_one(codes: &Vec<BitArray>) -> u64 {
     ga * ea
 }
 
-pub fn part_two(_codes: Vec<BitArray>) -> u64 {
-    let mut o2_codes = _codes.clone();
+pub fn part_two(codes: Vec<BitArray>) -> u64 {
+    let mut o2_codes = codes.clone();
     for i in (0..12).rev() {
         let (ones, zeros) = get_ones_count(&o2_codes, i);
         let num_to_match = if ones >= zeros { 1 } else { 0 };
@@ -67,7 +67,7 @@ pub fn part_two(_codes: Vec<BitArray>) -> u64 {
         }
     }
 
-    let mut co2_codes = _codes;
+    let mut co2_codes = codes;
     for i in (0..12).rev() {
         let (ones, zeros) = get_ones_count(&co2_codes, i);
         let num_to_match = if ones < zeros { 1 } else { 0 };
@@ -79,10 +79,11 @@ pub fn part_two(_codes: Vec<BitArray>) -> u64 {
             break;
         }
     }
-    let o2 = o2_codes.iter().next().unwrap();
-    let co2 = co2_codes.iter().next().unwrap();
+    let o2 = o2_codes.get(0).unwrap();
+    let co2 = co2_codes.get(0).unwrap();
     o2.arr * co2.arr
 }
+
 #[cfg(test)]
 mod test {
     use super::*;
@@ -97,7 +98,7 @@ mod test {
                 arr: u64::from_str_radix(x, 2).unwrap(),
             })
             .collect();
-        assert_eq!(part_one(&codes), 775304);
+        assert_eq!(part_one(&codes), 775_304);
     }
     #[test]
     fn d3b() {
@@ -109,6 +110,6 @@ mod test {
                 arr: u64::from_str_radix(x, 2).unwrap(),
             })
             .collect();
-        assert_eq!(part_two(codes), 1370737);
+        assert_eq!(part_two(codes), 1_370_737);
     }
 }

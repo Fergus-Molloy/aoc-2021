@@ -16,7 +16,7 @@ pub fn solve(aoc_input: AdventOfCodeInput) -> String {
             let second = x.split('|').nth(1).unwrap();
             let input = first
                 .split(' ')
-                .filter(|x| x.len() > 0)
+                .filter(|x| !x.is_empty())
                 .map(|x| {
                     let mut sorted = x.trim().chars().collect::<Vec<char>>();
                     sorted.sort_unstable();
@@ -26,7 +26,7 @@ pub fn solve(aoc_input: AdventOfCodeInput) -> String {
             let output = second
                 .trim()
                 .split(' ')
-                .filter(|x| x.len() > 0)
+                .filter(|x| !x.is_empty())
                 .map(|x| {
                     let mut sorted = x.trim().chars().collect::<Vec<char>>();
                     sorted.sort_unstable();
@@ -41,22 +41,16 @@ pub fn solve(aoc_input: AdventOfCodeInput) -> String {
     format!("Day 8: ({},{})", pt1, pt2)
 }
 
-pub fn part_one(notes: &Vec<Notes>) -> u64 {
+pub fn part_one(notes: &[Notes]) -> u64 {
     let parts = notes.iter().map(|x| &x.output).map(|x| {
         x.iter()
-            .filter(|y| match y.len() {
-                2 => true,
-                3 => true,
-                4 => true,
-                7 => true,
-                _ => false,
-            })
+            .filter(|y| matches!(y.len(), 2 | 3 | 4 | 7))
             .count() as u64
     });
     parts.sum::<u64>()
 }
 
-fn pattern_diff(left: &String, right: &String) -> bool {
+fn pattern_diff(left: &str, right: &str) -> bool {
     let mut res = false;
     for c in right.chars() {
         if !left.contains(&c.to_string()) {
@@ -66,7 +60,7 @@ fn pattern_diff(left: &String, right: &String) -> bool {
     res
 }
 
-fn reverse_diff(left: &String, right: &String) -> bool {
+fn reverse_diff(left: &str, right: &str) -> bool {
     let mut res = true;
     for c in left.chars() {
         if !right.contains(&c.to_string()) {
@@ -79,7 +73,7 @@ fn reverse_diff(left: &String, right: &String) -> bool {
 pub fn part_two(notes: &mut Vec<Notes>) -> u64 {
     let mut values = Vec::new();
     for display in notes {
-        &display.input[..].sort_by(|a, b| a.len().cmp(&b.len()));
+        display.input[..].sort_by(|a, b| a.len().cmp(&b.len()));
         let mut map = FxHashMap::default();
         map.try_insert(1, display.input[0].clone());
         map.try_insert(7, display.input[1].clone());
@@ -90,14 +84,11 @@ pub fn part_two(notes: &mut Vec<Notes>) -> u64 {
         let six_long = display.input[6..display.input.len() - 1].iter();
         // find 6
         for code in six_long.clone() {
-            match map.get(&1) {
-                Some(pattern) => {
-                    if pattern_diff(code, pattern) {
-                        map.try_insert(6, code.clone());
-                        break;
-                    }
+            if let Some(pattern) = map.get(&1) {
+                if pattern_diff(code, pattern) {
+                    map.try_insert(6, code.clone());
+                    break;
                 }
-                None => (),
             }
         }
         // find 0
@@ -105,14 +96,11 @@ pub fn part_two(notes: &mut Vec<Notes>) -> u64 {
             if map.values().any(|x| x == code) {
                 continue;
             }
-            match map.get(&4) {
-                Some(pattern) => {
-                    if pattern_diff(code, pattern) {
-                        map.try_insert(0, code.clone());
-                        break;
-                    }
+            if let Some(pattern) = map.get(&4) {
+                if pattern_diff(code, pattern) {
+                    map.try_insert(0, code.clone());
+                    break;
                 }
-                None => (),
             }
         }
         // find 9
@@ -124,14 +112,11 @@ pub fn part_two(notes: &mut Vec<Notes>) -> u64 {
         }
         // find 5
         for code in five_long.clone() {
-            match map.get(&6) {
-                Some(pattern) => {
-                    if reverse_diff(code, pattern) {
-                        map.try_insert(5, code.clone());
-                        break;
-                    }
+            if let Some(pattern) = map.get(&6) {
+                if reverse_diff(code, pattern) {
+                    map.try_insert(5, code.clone());
+                    break;
                 }
-                None => (),
             }
         }
         // find 3
@@ -139,14 +124,11 @@ pub fn part_two(notes: &mut Vec<Notes>) -> u64 {
             if map.values().any(|x| x == code) {
                 continue;
             }
-            match map.get(&9) {
-                Some(pattern) => {
-                    if reverse_diff(code, pattern) {
-                        map.try_insert(3, code.clone());
-                        break;
-                    }
+            if let Some(pattern) = map.get(&9) {
+                if reverse_diff(code, pattern) {
+                    map.try_insert(3, code.clone());
+                    break;
                 }
-                None => (),
             }
         }
         // find 2
@@ -183,13 +165,13 @@ mod test {
                 let second = x.split('|').nth(1).unwrap();
                 let input = first
                     .split(' ')
-                    .filter(|x| x.len() > 0)
+                    .filter(|x| !x.is_empty())
                     .map(|x| String::from(x.trim()))
                     .collect();
                 let output = second
                     .trim()
                     .split(' ')
-                    .filter(|x| x.len() > 0)
+                    .filter(|x| !x.is_empty())
                     .map(|x| String::from(x.trim()))
                     .collect();
                 Notes { input, output }
@@ -208,7 +190,7 @@ mod test {
                 let second = x.split('|').nth(1).unwrap();
                 let input = first
                     .split(' ')
-                    .filter(|x| x.len() > 0)
+                    .filter(|x| !x.is_empty())
                     .map(|x| {
                         let mut sorted = x.trim().chars().collect::<Vec<char>>();
                         sorted.sort_unstable();
@@ -218,7 +200,7 @@ mod test {
                 let output = second
                     .trim()
                     .split(' ')
-                    .filter(|x| x.len() > 0)
+                    .filter(|x| !x.is_empty())
                     .map(|x| {
                         let mut sorted = x.trim().chars().collect::<Vec<char>>();
                         sorted.sort_unstable();

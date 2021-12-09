@@ -7,15 +7,16 @@ pub struct HeightMap {
 }
 
 impl HeightMap {
-    #[inline(always)]
     const fn max_y(&self) -> usize {
         self.size.y
     }
-    #[inline(always)]
     const fn max_x(&self) -> usize {
         self.size.x
     }
-    pub fn new(inp: String) -> Self {
+
+    /// # Panics
+    #[must_use]
+    pub fn new(inp: &str) -> Self {
         let map: Vec<Vec<usize>> = inp
             .lines()
             .map(|x| {
@@ -32,7 +33,7 @@ impl HeightMap {
             },
         }
     }
-    #[inline(always)]
+
     fn get_adjacent_points(&self, point: Point) -> Vec<Point> {
         let mut points = Vec::with_capacity(4);
         if point.y > 0 {
@@ -59,11 +60,12 @@ impl HeightMap {
         let values_to_check = self.get_adjacent_points(point);
         values_to_check.iter().all(|x| self.get(x) > h)
     }
-    #[inline(always)]
+
     fn get(&self, point: &Point) -> usize {
         self.map[point.y][point.x]
     }
 }
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct Point {
     x: usize,
@@ -71,20 +73,18 @@ pub struct Point {
 }
 
 impl Point {
-    #[inline(always)]
     fn new(x: usize, y: usize) -> Self {
         Point { x, y }
     }
 }
 
 pub fn solve(aoc_input: AdventOfCodeInput) -> String {
-    let hmap = HeightMap::new(aoc_input.inp);
+    let hmap = HeightMap::new(&aoc_input.inp);
     let pt1 = part_one(&hmap);
-    let pt2 = part_two(hmap);
+    let pt2 = part_two(&hmap);
     format!("Day 9: ({},{})", pt1, pt2)
 }
 
-#[inline(always)]
 fn get_lowest(hmap: &HeightMap) -> FxHashSet<Point> {
     let mut lowest = FxHashSet::default();
     for y in 0..hmap.max_y() {
@@ -103,8 +103,8 @@ pub fn part_one(hmap: &HeightMap) -> u64 {
     lowest.iter().map(|x| (hmap.get(x) + 1) as u64).sum::<u64>()
 }
 
-pub fn part_two(hmap: HeightMap) -> u64 {
-    let lowest = get_lowest(&hmap);
+pub fn part_two(hmap: &HeightMap) -> u64 {
+    let lowest = get_lowest(hmap);
     let mut sizes: Vec<u64> = Vec::with_capacity(lowest.len());
     for point in lowest {
         let mut points = FxHashSet::default();
@@ -113,7 +113,7 @@ pub fn part_two(hmap: HeightMap) -> u64 {
         while added != 0 {
             added = 0;
             let mut new_points = points.clone();
-            for p in points.iter() {
+            for p in &points {
                 let adj = hmap.get_adjacent_points(*p);
                 let to_add = adj.into_iter().filter(|x| hmap.get(x) != 9);
                 for new_p in to_add {
@@ -143,14 +143,14 @@ mod test {
     #[test]
     fn d1a() {
         let aoc_input = AdventOfCodeInput::get_input(9);
-        let hmap = HeightMap::new(aoc_input.inp);
+        let hmap = HeightMap::new(&aoc_input.inp);
         assert_eq!(part_one(&hmap), 444);
     }
 
     #[test]
     fn d1b() {
         let aoc_input = AdventOfCodeInput::get_input(9);
-        let hmap = HeightMap::new(aoc_input.inp);
-        assert_eq!(part_two(hmap), 1168440);
+        let hmap = HeightMap::new(&aoc_input.inp);
+        assert_eq!(part_two(&hmap), 1168440);
     }
 }

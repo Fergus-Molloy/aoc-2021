@@ -60,7 +60,7 @@ impl BingoBoard {
                 return true;
             }
         }
-        return false;
+        false
     }
 
     fn sum_uncalled(&self) -> u64 {
@@ -119,7 +119,7 @@ pub fn solve(aoc_input: AdventOfCodeInput) -> String {
     format!("Day 4: ({},{})", pt1, pt2)
 }
 
-pub fn part_one(numbers: &Vec<u64>, boards: &mut Vec<BingoBoard>) -> u64 {
+pub fn part_one(numbers: &[u64], boards: &mut Vec<BingoBoard>) -> u64 {
     for num in numbers {
         for board in boards.iter_mut() {
             board.call_num(*num);
@@ -127,8 +127,13 @@ pub fn part_one(numbers: &Vec<u64>, boards: &mut Vec<BingoBoard>) -> u64 {
         if boards.iter().any(|x| x.won()) {
             return boards
                 .iter()
-                .filter(|x| x.won())
-                .map(|x| x.sum_uncalled())
+                .filter_map(|x| {
+                    if x.won() {
+                        Some(x.sum_uncalled())
+                    } else {
+                        None
+                    }
+                })
                 .max()
                 .unwrap()
                 * num;
@@ -137,9 +142,8 @@ pub fn part_one(numbers: &Vec<u64>, boards: &mut Vec<BingoBoard>) -> u64 {
     panic!("No boards one even after all numbers were called");
 }
 
-pub fn part_two(numbers: &Vec<u64>, boards: &mut Vec<BingoBoard>) -> u64 {
+pub fn part_two(numbers: &[u64], boards: &mut Vec<BingoBoard>) -> u64 {
     // flags for last board
-    let mut last_board = false;
     let mut num_for_final = 0;
     for (i, num) in numbers.iter().enumerate() {
         for board in boards.iter_mut() {
@@ -147,15 +151,11 @@ pub fn part_two(numbers: &Vec<u64>, boards: &mut Vec<BingoBoard>) -> u64 {
             board.won = board.won();
         }
         if boards.iter().filter(|x| !x.won).count() == 1 {
-            last_board = true;
             num_for_final = i + 1;
             break;
         }
     }
-    if !last_board {
-        panic!("No boards one even after all numbers were called");
-    }
-    let mut last_board = boards.iter_mut().filter(|x| !x.won).next().unwrap();
+    let mut last_board = boards.iter_mut().find(|x| !x.won).unwrap();
     while !last_board.won {
         last_board.call_num(numbers[num_for_final]);
         last_board.won = last_board.won();
@@ -163,6 +163,7 @@ pub fn part_two(numbers: &Vec<u64>, boards: &mut Vec<BingoBoard>) -> u64 {
     }
     last_board.sum_uncalled() * numbers[num_for_final - 1]
 }
+
 #[cfg(test)]
 mod test {
     use super::*;

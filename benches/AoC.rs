@@ -1,3 +1,4 @@
+#![warn(clippy::pedantic)]
 use aoc_2021::advent_of_code::AdventOfCodeInput;
 use aoc_2021::solutions::{
     day_eight, day_five, day_four, day_nine, day_one, day_seven, day_six, day_three, day_two,
@@ -14,27 +15,25 @@ fn bench_day_one(c: &mut Criterion) {
     let depths: Vec<_> = aoc_input
         .inp
         .lines()
-        .map(|x| x.parse::<i64>().unwrap())
+        .map(|x| x.parse::<u32>().unwrap())
         .collect();
 
     c.bench_function("d1a", |b| b.iter(|| day_one::part_one(black_box(&depths))));
-    c.bench_function("d1b", |b| {
-        b.iter(|| day_one::part_two(black_box(depths.clone())))
-    });
+    c.bench_function("d1b", |b| b.iter(|| day_one::part_two(black_box(&depths))));
     c.bench_function("d1c", |b| {
-        b.iter(|| day_one::solve(black_box(aoc_input.clone())))
+        b.iter(|| day_one::solve(black_box(aoc_input.clone())));
     });
 }
 
 fn bench_day_two(c: &mut Criterion) {
     let aoc_input = load_inp(2);
 
-    let inp = day_two::parse(aoc_input.clone().inp);
+    let inp = day_two::parse(&aoc_input.clone().inp);
 
     c.bench_function("d2a", |b| b.iter(|| day_two::part_one(black_box(&inp))));
     c.bench_function("d2b", |b| b.iter(|| day_two::part_two(black_box(&inp))));
     c.bench_function("d2c", |b| {
-        b.iter(|| day_two::solve(black_box(aoc_input.clone())))
+        b.iter(|| day_two::solve(black_box(aoc_input.clone())));
     });
 }
 
@@ -52,10 +51,10 @@ fn bench_day_three(c: &mut Criterion) {
 
     c.bench_function("d3a", |b| b.iter(|| day_three::part_one(black_box(&codes))));
     c.bench_function("d3b", |b| {
-        b.iter(|| day_three::part_two(black_box(codes.clone())))
+        b.iter(|| day_three::part_two(black_box(codes.clone())));
     });
     c.bench_function("d3c", |b| {
-        b.iter(|| day_three::solve(black_box(aoc_input.clone())))
+        b.iter(|| day_three::solve(black_box(aoc_input.clone())));
     });
 }
 
@@ -64,13 +63,13 @@ fn bench_day_four(c: &mut Criterion) {
     let (boards, numbers) = day_four::parse(aoc_input.clone());
 
     c.bench_function("d4a", |b| {
-        b.iter(|| day_four::part_one(black_box(&numbers), black_box(&mut boards.clone())))
+        b.iter(|| day_four::part_one(black_box(&numbers), black_box(&mut boards.clone())));
     });
     c.bench_function("d4b", |b| {
-        b.iter(|| day_four::part_two(black_box(&numbers), black_box(&mut boards.clone())))
+        b.iter(|| day_four::part_two(black_box(&numbers), black_box(&mut boards.clone())));
     });
     c.bench_function("d4c", |b| {
-        b.iter(|| day_four::solve(black_box(aoc_input.clone())))
+        b.iter(|| day_four::solve(black_box(aoc_input.clone())));
     });
 }
 
@@ -78,13 +77,13 @@ fn bench_day_five(c: &mut Criterion) {
     let aoc_input = load_inp(5);
 
     c.bench_function("d5a", |b| {
-        b.iter(|| day_five::part_one(black_box(&aoc_input.inp)))
+        b.iter(|| day_five::part_one(black_box(&aoc_input.inp)));
     });
     c.bench_function("d5b", |b| {
-        b.iter(|| day_five::part_two(black_box(&aoc_input.inp)))
+        b.iter(|| day_five::part_two(black_box(&aoc_input.inp)));
     });
     c.bench_function("d5c", |b| {
-        b.iter(|| day_five::solve(black_box(aoc_input.clone())))
+        b.iter(|| day_five::solve(black_box(aoc_input.clone())));
     });
 }
 
@@ -108,13 +107,13 @@ fn bench_day_six(c: &mut Criterion) {
     }
 
     c.bench_function("d6a", |b| {
-        b.iter(|| day_six::part_one(black_box(&fish_ages)))
+        b.iter(|| day_six::part_one(black_box(&fish_ages)));
     });
     c.bench_function("d6b", |b| {
-        b.iter(|| day_six::part_two(black_box(&fish_ages)))
+        b.iter(|| day_six::part_two(black_box(&fish_ages)));
     });
     c.bench_function("d6c", |b| {
-        b.iter(|| day_six::solve(black_box(aoc_input.clone())))
+        b.iter(|| day_six::solve(black_box(aoc_input.clone())));
     });
 }
 
@@ -130,7 +129,7 @@ fn bench_day_seven(c: &mut Criterion) {
     c.bench_function("d7a", |b| b.iter(|| day_seven::part_one(black_box(&crabs))));
     c.bench_function("d7b", |b| b.iter(|| day_seven::part_two(black_box(&crabs))));
     c.bench_function("d7c", |b| {
-        b.iter(|| day_seven::solve(black_box(aoc_input.clone())))
+        b.iter(|| day_seven::solve(black_box(aoc_input.clone())));
     });
 }
 fn bench_day_eight(c: &mut Criterion) {
@@ -145,20 +144,20 @@ fn bench_day_eight(c: &mut Criterion) {
             let second = x.split('|').nth(1).unwrap();
             let input = first
                 .split(' ')
-                .filter(|x| x.len() > 0)
+                .filter(|x| !x.is_empty())
                 .map(|x| {
                     let mut sorted = x.trim().chars().collect::<Vec<char>>();
-                    sorted.sort();
+                    sorted.sort_unstable();
                     String::from_iter(sorted)
                 })
                 .collect();
             let output = second
                 .trim()
                 .split(' ')
-                .filter(|x| x.len() > 0)
+                .filter(|x| !x.is_empty())
                 .map(|x| {
                     let mut sorted = x.trim().chars().collect::<Vec<char>>();
-                    sorted.sort();
+                    sorted.sort_unstable();
                     String::from_iter(sorted)
                 })
                 .collect();
@@ -168,23 +167,23 @@ fn bench_day_eight(c: &mut Criterion) {
 
     c.bench_function("d8a", |b| b.iter(|| day_eight::part_one(black_box(&notes))));
     c.bench_function("d8b", |b| {
-        b.iter(|| day_eight::part_two(black_box(&mut notes)))
+        b.iter(|| day_eight::part_two(black_box(&mut notes)));
     });
     c.bench_function("d8c", |b| {
-        b.iter(|| day_eight::solve(black_box(aoc_input.clone())))
+        b.iter(|| day_eight::solve(black_box(aoc_input.clone())));
     });
 }
 
 fn bench_day_nine(c: &mut Criterion) {
     use day_nine::HeightMap;
     let aoc_input = load_inp(9);
-    let hmap = HeightMap::new(aoc_input.inp.clone());
+    let hmap = HeightMap::new(&aoc_input.inp);
     c.bench_function("d9a", |b| b.iter(|| day_nine::part_one(black_box(&hmap))));
     c.bench_function("d9b", |b| {
-        b.iter(|| day_nine::part_two(black_box(hmap.clone())))
+        b.iter(|| day_nine::part_two(black_box(&hmap)));
     });
     c.bench_function("d9c", |b| {
-        b.iter(|| day_nine::solve(black_box(aoc_input.clone())))
+        b.iter(|| day_nine::solve(black_box(aoc_input.clone())));
     });
 }
 

@@ -1,5 +1,6 @@
 use crate::advent_of_code::AdventOfCodeInput;
 use rustc_hash::FxHashMap;
+
 pub fn solve(aoc_input: AdventOfCodeInput) -> String {
     let fish: Vec<u64> = aoc_input
         .inp
@@ -26,18 +27,13 @@ fn execute(fish: &FxHashMap<u64, u64>, lim: u64) -> u64 {
     for _ in 0..lim {
         let mut new_map = FxHashMap::default();
 
-        match curr_fish.get(&0) {
-            Some(val) => {
-                new_map.insert(8, *val);
-                new_map.insert(6, *val);
-            }
-            None => (),
+        if let Some(val) = curr_fish.get(&0) {
+            new_map.insert(8, *val);
+            new_map.insert(6, *val);
         }
 
         for (key, val) in curr_fish {
-            if key == 0 {
-                continue;
-            } else {
+            if key != 0 {
                 let _ = match new_map.get(&(key - 1)) {
                     Some(v) => {
                         let new_val = v + val;
@@ -60,6 +56,7 @@ pub fn part_one(fish: &FxHashMap<u64, u64>) -> u64 {
 pub fn part_two(fish: &FxHashMap<u64, u64>) -> u64 {
     execute(fish, 256)
 }
+
 #[cfg(test)]
 mod test {
     use super::*;

@@ -1,3 +1,4 @@
+#![warn(clippy::pedantic)]
 use aoc_2021::advent_of_code::AdventOfCodeInput;
 use aoc_2021::solutions::{
     day_eight, day_five, day_four, day_nine, day_one, day_seven, day_six, day_three, day_two,
@@ -5,7 +6,7 @@ use aoc_2021::solutions::{
 use std::time::Instant;
 fn main() {
     let start = Instant::now();
-    for i in 9..10 {
+    for i in 1..=9 {
         let input = AdventOfCodeInput::get_input(i);
         match i {
             1 => println!("{}", day_one::solve(input)),

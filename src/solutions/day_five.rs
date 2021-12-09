@@ -1,21 +1,15 @@
 use crate::advent_of_code::AdventOfCodeInput;
-use std::collections::HashMap;
+use rustc_hash::FxHashMap;
 use std::fmt::Formatter;
 #[derive(Debug, Clone)]
 struct Line {
     start: Point,
     end: Point,
 }
-#[derive(Clone, Copy, Hash)]
+#[derive(Clone, Copy, Hash, PartialEq, Eq)]
 struct Point {
     x: u64,
     y: u64,
-}
-impl std::cmp::Eq for Point {}
-impl std::cmp::PartialEq for Point {
-    fn eq(&self, other: &Point) -> bool {
-        self.x == other.x && self.y == other.y
-    }
 }
 
 impl std::fmt::Debug for Point {
@@ -45,14 +39,14 @@ impl Line {
         let end = self.end;
         let mut points = Vec::new();
         let x_range: Vec<u64> = if start.x < end.x {
-            (start.x..(end.x + 1)).collect()
+            (start.x..=end.x).collect()
         } else {
-            (end.x..(start.x + 1)).rev().collect()
+            (end.x..=start.x).rev().collect()
         };
         let y_range: Vec<u64> = if start.y < end.y {
-            (start.y..(end.y + 1)).collect()
+            (start.y..=end.y).collect()
         } else {
-            (end.y..(start.y + 1)).rev().collect()
+            (end.y..=start.y).rev().collect()
         };
         if start.x == end.x {
             let len = ((start.y as i64 - end.y as i64).pow(2) as f64).sqrt();
@@ -93,8 +87,8 @@ pub fn solve(aoc_input: AdventOfCodeInput) -> String {
     format!("Day 5: ({},{})", pt1, pt2)
 }
 
-pub fn part_one(inp: &String) -> u64 {
-    let mut map = HashMap::new();
+pub fn part_one(inp: &str) -> u64 {
+    let mut map = FxHashMap::default();
     let lines = inp.lines();
     for line in lines {
         let mut parts = line.split(' ');
@@ -117,8 +111,8 @@ pub fn part_one(inp: &String) -> u64 {
     map.iter().filter(|(_, val)| **val > 1).count() as u64
 }
 
-pub fn part_two(inp: &String) -> u64 {
-    let mut map = HashMap::new();
+pub fn part_two(inp: &str) -> u64 {
+    let mut map = FxHashMap::default();
     let lines = inp.lines();
     for line in lines {
         let mut parts = line.split(' ');
@@ -138,6 +132,7 @@ pub fn part_two(inp: &String) -> u64 {
     }
     map.iter().filter(|(_, val)| **val > 1).count() as u64
 }
+
 #[cfg(test)]
 mod test {
     use super::*;

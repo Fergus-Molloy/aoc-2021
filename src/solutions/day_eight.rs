@@ -1,13 +1,14 @@
 #![allow(unused_must_use)]
 use crate::advent_of_code::AdventOfCodeInput;
 use std::collections::HashMap;
+#[derive(Debug)]
 pub struct Notes {
     pub input: Vec<String>,
     pub output: Vec<String>,
 }
 
 pub fn solve(aoc_input: AdventOfCodeInput) -> String {
-    let notes: Vec<_> = aoc_input
+    let mut notes: Vec<_> = aoc_input
         .inp
         .lines()
         .map(|x| {
@@ -36,7 +37,7 @@ pub fn solve(aoc_input: AdventOfCodeInput) -> String {
         })
         .collect();
     let pt1 = part_one(&notes);
-    let pt2 = part_two(&notes);
+    let pt2 = part_two(&mut notes);
     format!("Day 8: ({},{})", pt1, pt2)
 }
 
@@ -75,23 +76,20 @@ fn reverse_diff(left: &String, right: &String) -> bool {
     res
 }
 
-pub fn part_two(notes: &Vec<Notes>) -> u64 {
+pub fn part_two(notes: &mut Vec<Notes>) -> u64 {
     let mut values = Vec::new();
     for display in notes {
+        &display.input[..].sort_by(|a, b| a.len().cmp(&b.len()));
         let mut map = HashMap::new();
-        // find easy ones
-        for code in display.input.clone() {
-            match code.len() {
-                2 => map.try_insert(1, code),
-                3 => map.try_insert(7, code),
-                4 => map.try_insert(4, code),
-                7 => map.try_insert(8, code),
-                _ => continue,
-            };
-        }
+        map.try_insert(1, display.input[0].clone());
+        map.try_insert(7, display.input[1].clone());
+        map.try_insert(4, display.input[2].clone());
+        map.try_insert(8, display.input[display.input.len() - 1].clone());
 
+        let five_long = display.input[3..6].iter();
+        let six_long = display.input[6..display.input.len() - 1].iter();
         // find 6
-        for code in display.input.clone().iter().filter(|x| x.len() == 6) {
+        for code in six_long.clone() {
             match map.get(&1) {
                 Some(pattern) => {
                     if pattern_diff(code, pattern) {
@@ -99,11 +97,11 @@ pub fn part_two(notes: &Vec<Notes>) -> u64 {
                         break;
                     }
                 }
-                None => println!("Could not find pattern 1",),
+                None => (),
             }
         }
         // find 0
-        for code in display.input.clone().iter().filter(|x| x.len() == 6) {
+        for code in six_long.clone() {
             if map.values().any(|x| x == code) {
                 continue;
             }
@@ -118,14 +116,14 @@ pub fn part_two(notes: &Vec<Notes>) -> u64 {
             }
         }
         // find 9
-        for code in display.input.clone().iter().filter(|x| x.len() == 6) {
+        for code in six_long {
             if !map.values().any(|x| x == code) {
                 map.try_insert(9, code.clone());
                 break;
             }
         }
         // find 5
-        for code in display.input.clone().iter().filter(|x| x.len() == 5) {
+        for code in five_long.clone() {
             match map.get(&6) {
                 Some(pattern) => {
                     if reverse_diff(code, pattern) {
@@ -137,7 +135,7 @@ pub fn part_two(notes: &Vec<Notes>) -> u64 {
             }
         }
         // find 3
-        for code in display.input.clone().iter().filter(|x| x.len() == 5) {
+        for code in five_long.clone() {
             if map.values().any(|x| x == code) {
                 continue;
             }
@@ -152,18 +150,18 @@ pub fn part_two(notes: &Vec<Notes>) -> u64 {
             }
         }
         // find 2
-        for code in display.input.clone().iter().filter(|x| x.len() == 5) {
+        for code in five_long {
             if !map.values().any(|x| x == code) {
                 map.try_insert(2, code.clone());
             }
         }
         let mut value = String::new();
+        let mut final_map = HashMap::new();
+        for (key, val) in map.clone() {
+            final_map.insert(val, key);
+        }
         for val in display.output.clone() {
-            for (key, num) in map.clone() {
-                if val == num {
-                    value.push_str(&format!("{}", key));
-                }
-            }
+            value.push_str(&format!("{}", final_map.get(&val).unwrap()));
         }
         values.push(value.parse::<u64>().unwrap());
     }
@@ -175,7 +173,7 @@ mod test {
     use super::*;
     use crate::advent_of_code::AdventOfCodeInput;
     #[test]
-    fn d1a() {
+    fn d8a() {
         let aoc_input = AdventOfCodeInput::get_input(8);
         let notes: Vec<_> = aoc_input
             .inp
@@ -200,8 +198,36 @@ mod test {
         assert_eq!(part_one(&notes), 272);
     }
     #[test]
-    fn d1b() {
+    fn d8b() {
         let aoc_input = AdventOfCodeInput::get_input(8);
-        assert_eq!(0, 0);
+        let mut notes: Vec<_> = aoc_input
+            .inp
+            .lines()
+            .map(|x| {
+                let first = x.split('|').next().unwrap();
+                let second = x.split('|').nth(1).unwrap();
+                let input = first
+                    .split(' ')
+                    .filter(|x| x.len() > 0)
+                    .map(|x| {
+                        let mut sorted = x.trim().chars().collect::<Vec<char>>();
+                        sorted.sort();
+                        String::from_iter(sorted)
+                    })
+                    .collect();
+                let output = second
+                    .trim()
+                    .split(' ')
+                    .filter(|x| x.len() > 0)
+                    .map(|x| {
+                        let mut sorted = x.trim().chars().collect::<Vec<char>>();
+                        sorted.sort();
+                        String::from_iter(sorted)
+                    })
+                    .collect();
+                Notes { input, output }
+            })
+            .collect();
+        assert_eq!(part_two(&mut notes), 1007675);
     }
 }

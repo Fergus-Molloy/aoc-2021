@@ -1,6 +1,6 @@
 use aoc_2021::advent_of_code::AdventOfCodeInput;
 use aoc_2021::solutions::{
-    day_eight, day_five, day_four, day_one, day_seven, day_six, day_three, day_two,
+    day_eight, day_five, day_four, day_nine, day_one, day_seven, day_six, day_three, day_two,
 };
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
 
@@ -137,7 +137,7 @@ fn bench_day_eight(c: &mut Criterion) {
     use day_eight::Notes;
     let aoc_input = load_inp(8);
 
-    let notes: Vec<_> = aoc_input
+    let mut notes: Vec<_> = aoc_input
         .inp
         .lines()
         .map(|x| {
@@ -167,9 +167,24 @@ fn bench_day_eight(c: &mut Criterion) {
         .collect();
 
     c.bench_function("d8a", |b| b.iter(|| day_eight::part_one(black_box(&notes))));
-    c.bench_function("d8b", |b| b.iter(|| day_eight::part_two(black_box(&notes))));
+    c.bench_function("d8b", |b| {
+        b.iter(|| day_eight::part_two(black_box(&mut notes)))
+    });
     c.bench_function("d8c", |b| {
         b.iter(|| day_eight::solve(black_box(aoc_input.clone())))
+    });
+}
+
+fn bench_day_nine(c: &mut Criterion) {
+    use day_nine::HeightMap;
+    let aoc_input = load_inp(9);
+    let hmap = HeightMap::new(aoc_input.inp.clone());
+    c.bench_function("d9a", |b| b.iter(|| day_nine::part_one(black_box(&hmap))));
+    c.bench_function("d9b", |b| {
+        b.iter(|| day_nine::part_two(black_box(hmap.clone())))
+    });
+    c.bench_function("d9c", |b| {
+        b.iter(|| day_nine::solve(black_box(aoc_input.clone())))
     });
 }
 
@@ -181,4 +196,5 @@ criterion_group!(day_5, bench_day_five);
 criterion_group!(day_6, bench_day_six);
 criterion_group!(day_7, bench_day_seven);
 criterion_group!(day_8, bench_day_eight);
-criterion_main!(day_1, day_2, day_3, day_4, day_5, day_6, day_7, day_8);
+criterion_group!(day_9, bench_day_nine);
+criterion_main!(day_1, day_2, day_3, day_4, day_5, day_6, day_7, day_8, day_9);

@@ -1,7 +1,8 @@
 #![warn(clippy::pedantic)]
 use aoc_2021::advent_of_code::AdventOfCodeInput;
 use aoc_2021::solutions::{
-    day_eight, day_five, day_four, day_nine, day_one, day_seven, day_six, day_three, day_two,
+    day_eight, day_five, day_four, day_nine, day_one, day_seven, day_six, day_ten, day_three,
+    day_two,
 };
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
 
@@ -186,6 +187,17 @@ fn bench_day_nine(c: &mut Criterion) {
         b.iter(|| day_nine::solve(black_box(aoc_input.clone())));
     });
 }
+fn bench_day_ten(c: &mut Criterion) {
+    let aoc_input = load_inp(10);
+    let lines = aoc_input.inp.lines().map(str::to_owned).collect::<Vec<_>>();
+    c.bench_function("d10a", |b| b.iter(|| day_ten::part_one(black_box(&lines))));
+    c.bench_function("d10b", |b| {
+        b.iter(|| day_ten::part_two(black_box(&lines)));
+    });
+    c.bench_function("d10c", |b| {
+        b.iter(|| day_ten::solve(black_box(aoc_input.clone())));
+    });
+}
 
 criterion_group!(day_1, bench_day_one);
 criterion_group!(day_2, bench_day_two);
@@ -196,4 +208,5 @@ criterion_group!(day_6, bench_day_six);
 criterion_group!(day_7, bench_day_seven);
 criterion_group!(day_8, bench_day_eight);
 criterion_group!(day_9, bench_day_nine);
-criterion_main!(day_1, day_2, day_3, day_4, day_5, day_6, day_7, day_8, day_9);
+criterion_group!(day_10, bench_day_ten);
+criterion_main!(day_1, day_2, day_3, day_4, day_5, day_6, day_7, day_8, day_9, day_10);

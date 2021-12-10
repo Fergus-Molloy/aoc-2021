@@ -1,6 +1,6 @@
 # This is used to override the directory where cargo-criterion saves 
 # its data and generates reports.
-criterion_home = "./target/criterion"
+criterion_home = "./benchmarks"
 
 # This is used to configure the format of cargo-criterion's command-line output.
 # Options are:

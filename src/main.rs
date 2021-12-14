@@ -1,13 +1,13 @@
 #![warn(clippy::pedantic)]
 use aoc_2021::advent_of_code::AdventOfCodeInput;
 use aoc_2021::solutions::{
-    day_eight, day_eleven, day_five, day_four, day_nine, day_one, day_seven, day_six, day_ten,
-    day_three, day_two,
+    day_eight, day_eleven, day_five, day_four, day_fourteen, day_nine, day_one, day_seven, day_six,
+    day_ten, day_thirteen, day_three, day_twelve, day_two,
 };
 use std::time::Instant;
 fn main() {
     let start = Instant::now();
-    for i in 11..=11 {
+    for i in 14..=14 {
         let input = AdventOfCodeInput::get_input(i);
         match i {
             1 => println!("{}", day_one::solve(input)),
@@ -21,6 +21,9 @@ fn main() {
             9 => println!("{}", day_nine::solve(input)),
             10 => println!("{}", day_ten::solve(input)),
             11 => println!("{}", day_eleven::solve(input)),
+            12 => println!("{}", day_twelve::solve(input)),
+            13 => println!("{}", day_thirteen::solve(input)),
+            14 => println!("{}", day_fourteen::solve(input)),
             _ => unimplemented!(),
         }
     }

@@ -111,13 +111,13 @@ mod test {
     use super::*;
     use crate::advent_of_code::AdventOfCodeInput;
     #[test]
-    fn d1a() {
+    fn d13a() {
         let aoc_input = AdventOfCodeInput::get_input(13);
         let paper = parse(aoc_input.inp);
         assert_eq!(part_one(&paper), 1722);
     }
     #[test]
-    fn d1b() {
+    fn d13b() {
         let aoc_input = AdventOfCodeInput::get_input(13);
         let paper = parse(aoc_input.inp);
         assert_eq!(part_two(&paper), 1748);

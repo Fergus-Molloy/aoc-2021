@@ -141,14 +141,14 @@ mod test {
     use super::*;
     use crate::advent_of_code::AdventOfCodeInput;
     #[test]
-    fn d1a() {
+    fn d9a() {
         let aoc_input = AdventOfCodeInput::get_input(9);
         let hmap = HeightMap::new(&aoc_input.inp);
         assert_eq!(part_one(&hmap), 444);
     }
 
     #[test]
-    fn d1b() {
+    fn d9b() {
         let aoc_input = AdventOfCodeInput::get_input(9);
         let hmap = HeightMap::new(&aoc_input.inp);
         assert_eq!(part_two(&hmap), 1168440);

@@ -1,8 +1,7 @@
 use crate::advent_of_code::AdventOfCodeInput;
 use rustc_hash::FxHashMap;
-use std::time::Instant;
 
-pub fn parse<'a>(inp: &'a str) -> (Vec<char>, FxHashMap<&'a str, char>) {
+pub fn parse<'a>(inp: &'a str) -> (Vec<char>, FxHashMap<(char, char), char>) {
     let mut template = Vec::new();
     let mut map = FxHashMap::default();
     for line in inp.lines() {
@@ -13,10 +12,10 @@ pub fn parse<'a>(inp: &'a str) -> (Vec<char>, FxHashMap<&'a str, char>) {
         if split.clone().count() == 1 {
             template = line.chars().collect();
         } else {
-            map.insert(
-                split.next().unwrap(),
-                split.next().unwrap().chars().next().unwrap(),
-            );
+            let mut to = split.next().unwrap().chars();
+            let a = to.next().unwrap();
+            let b = to.next().unwrap();
+            map.insert((a, b), split.next().unwrap().chars().next().unwrap());
         }
     }
     (template, map)
@@ -24,23 +23,60 @@ pub fn parse<'a>(inp: &'a str) -> (Vec<char>, FxHashMap<&'a str, char>) {
 
 pub fn solve(aoc_input: AdventOfCodeInput) -> String {
     let (mut template, map) = parse(&aoc_input.inp);
-    println!("template: {:?}", template);
     let pt1 = part_one(&mut template.clone(), &map);
-    let pt2 = 0; //part_two(&mut template, &map);
+    let pt2 = part_two(&mut template, &map);
     format!("Day 1: ({},{})", pt1, pt2)
 }
 
-fn step(template: &mut Vec<char>, map: &FxHashMap<&str, char>) {
+fn step(template: &mut Vec<char>, map: &FxHashMap<(char, char), char>) {
     let mut to_add = Vec::new();
     for idx in 0..(template.len() - 1) {
-        let lookup = format!("{}{}", template[idx], template[idx + 1]);
-        to_add.push(map.get(&lookup[..]).unwrap());
+        let lookup = (template[idx], template[idx + 1]);
+        to_add.push(map.get(&lookup).unwrap());
     }
     let mut count = 1;
     for a in to_add {
         template.insert(count, *a);
         count += 2;
     }
+}
+
+fn execute(template: &mut Vec<char>, map: &FxHashMap<(char, char), char>, lim: usize) -> u64 {
+    for _ in 0..lim {
+        step(template, map);
+    }
+    let (max, min) = most_least_freq(template);
+    (max - min) as u64
+}
+
+fn fast_execute(
+    template: &mut Vec<char>,
+    formulea: &FxHashMap<(char, char), char>,
+    lim: usize,
+) -> u64 {
+    let mut counts: FxHashMap<(char, char), u64> = FxHashMap::default();
+    let mut elements: FxHashMap<char, u64> = FxHashMap::default();
+    for idx in 0..(template.len() - 1) {
+        let lookup = (template[idx], template[idx + 1]);
+        *counts.entry(lookup).or_default() += 1;
+        *elements.entry(template[idx]).or_default() += 1;
+    }
+    *elements.entry(template[template.len() - 1]).or_default() += 1; // don't forget the last element
+
+    for _ in 0..lim {
+        let to_polymerize = counts.clone();
+        for (key, val) in &to_polymerize {
+            let pt1 = (key.0, *formulea.get(key).unwrap());
+            let pt2 = (*formulea.get(key).unwrap(), key.1);
+            *counts.entry(*key).or_default() -= val; //remove old pairing
+            *counts.entry(pt1).or_default() += val;
+            *counts.entry(pt2).or_default() += val;
+            *elements.entry(pt1.1).or_default() += val; //update element counts
+        }
+    }
+    let mut v = counts.into_iter().collect::<Vec<((char, char), u64)>>();
+    v.sort_by(|a, b| a.1.cmp(&b.1));
+    elements.values().max().unwrap() - elements.values().min().unwrap()
 }
 
 fn most_least_freq(array: &[char]) -> (usize, usize) {
@@ -51,25 +87,12 @@ fn most_least_freq(array: &[char]) -> (usize, usize) {
     (*map.values().max().unwrap(), *map.values().min().unwrap())
 }
 
-pub fn part_one(template: &mut Vec<char>, map: &FxHashMap<&str, char>) -> u64 {
-    for i in 0..15 {
-        let start = Instant::now();
-        step(template, map);
-        println!("completed step {} in {:?}", i, Instant::now() - start);
-        println!("Size: {}\n", template.len());
-    }
-    let start = Instant::now();
-    let (max, min) = most_least_freq(template);
-    println!("completed search in {:?}", Instant::now() - start);
-    (max - min) as u64
+pub fn part_one(template: &mut Vec<char>, map: &FxHashMap<(char, char), char>) -> u64 {
+    fast_execute(template, map, 10)
 }
 
-pub fn part_two(template: &mut Vec<char>, map: &FxHashMap<&str, char>) -> u64 {
-    for _ in 0..40 {
-        step(template, map);
-    }
-    let (max, min) = most_least_freq(template);
-    (max - min) as u64
+pub fn part_two(template: &mut Vec<char>, map: &FxHashMap<(char, char), char>) -> u64 {
+    fast_execute(template, map, 40)
 }
 
 #[cfg(test)]
@@ -77,15 +100,15 @@ mod test {
     use super::*;
     use crate::advent_of_code::AdventOfCodeInput;
     #[test]
-    fn d1a() {
-        let aoc_input = AdventOfCodeInput::get_input(1);
+    fn d14a() {
+        let aoc_input = AdventOfCodeInput::get_input(14);
         let (mut template, map) = parse(&aoc_input.inp);
-        assert_eq!(part_one(&mut template, &map), 1722);
+        assert_eq!(part_one(&mut template, &map), 2657);
     }
     #[test]
-    fn d1b() {
-        let aoc_input = AdventOfCodeInput::get_input(1);
+    fn d14b() {
+        let aoc_input = AdventOfCodeInput::get_input(14);
         let (mut template, map) = parse(&aoc_input.inp);
-        assert_eq!(part_two(&mut template, &map), 1748);
+        assert_eq!(part_two(&mut template, &map), 2911561572630);
     }
 }

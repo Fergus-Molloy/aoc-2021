@@ -145,7 +145,8 @@ mod test {
             .lines()
             .map(|x| x.parse::<u32>().unwrap())
             .collect();
-        assert_eq!(part_one(&depths), 1722);
+        //assert_eq!(part_one(&depths), 1722);
+        assert_eq!(0, 1722);
     }
     #[test]
     fn d12b() {
@@ -155,6 +156,7 @@ mod test {
             .lines()
             .map(|x| x.parse::<u32>().unwrap())
             .collect();
-        assert_eq!(part_two(&depths), 1748);
+        //assert_eq!(part_two(&depths), 1748);
+        assert_eq!(0, 1748);
     }
 }
